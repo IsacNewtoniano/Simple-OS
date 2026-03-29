@@ -1,22 +1,21 @@
 CC  = clang
 LLD = "/c/LLVM/bin/ld.lld.exe"
-CFLAGS  = -ffreestanding -nostdlib -m32 -target i386-pc-none-elf -c
+CFLAGS  = -ffreestanding -nostdlib -m32 -target i386-pc-none-elf -c -I.
 ASFLAGS = -m32 -target i386-pc-none-elf -c
 
-kernel.bin: multiboot.o start.o kernel.o
-	$(LLD) -T linker.ld multiboot.o start.o kernel.o -o kernel.bin
+OBJS = start.o kernel.o gdt.o idt.o vga.o isr.o pic.o timer.o keyboard.o
 
-multiboot.o: multiboot.s
-	$(CC) $(ASFLAGS) multiboot.s -o multiboot.o
+kernel.bin: $(OBJS)
+	$(LLD) -T linker.ld $(OBJS) -o kernel.bin
 
-start.o: start.s
-	$(CC) $(ASFLAGS) start.s -o start.o
+%.o: %.c
+	$(CC) $(CFLAGS) $< -o $@
 
-kernel.o: kernel.c
-	$(CC) $(CFLAGS) kernel.c -o kernel.o
+%.o: %.s
+	$(CC) $(ASFLAGS) $< -o $@
 
 run: kernel.bin
 	qemu-system-x86_64 -kernel kernel.bin -m 128M
 
 clean:
-	rm -f kernel.bin kernel.o start.o multiboot.o
+	rm -f *.o kernel.bin
