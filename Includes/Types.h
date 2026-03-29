@@ -97,7 +97,13 @@ typedef double *f64_pointer;
   ea:------------
 */
 
-typedef void non_return, *generic_pointer;
+typedef signed char chr;
+typedef signed char *chr_pointer;
+
+
+typedef void vd;
+typedef void non_return;
+typedef void *generic_pointer;
 
 #ifndef __bool_true_false_are_defined
 
